@@ -1,0 +1,40 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ar\n"
+
+msgid "Command not found: %s"
+msgstr "أمر غير معروف: %s"
+
+msgid "options"
+msgstr "الخيارات"
+
+msgid "subcommands"
+msgstr "الأوامر الفرعية"
+
+msgid "Arguments"
+msgstr "المعطيات"
+
+msgid "Options"
+msgstr "الخيارات"
+
+msgid "Subcommands"
+msgstr "الأوامر الفرعية"
+
+msgid "Invalid argument: %s"
+msgstr "معطى غير صالح: %s"
+
+msgid "Invalid option %s for command %s"
+msgstr "الخيار %s غير صالح للأمر %s"
+
+msgid "Invalid option %s"
+msgstr "خيار غير صالح %s"
+
+msgid "Missing required arguments for command: %s"
+msgstr "معطيات مطلوبة مفقودة للأمر: %s"
+
+msgid "Missing required arguments."
+msgstr "معطيات مطلوبة مفقودة."
+
+msgid "--مساعدة"
+msgstr "--help"

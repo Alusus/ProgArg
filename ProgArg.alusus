@@ -1,0 +1,232 @@
+import "Srl/Console";
+import "Srl/String";
+import "Srl/Array";
+import "Srl/Map";
+import "Srl/refs";
+import "Srl/Fs";
+import "closure";
+import "Apm";
+Apm.importFile("Alusus/I18n");
+
+module ProgArg {
+    use Srl;
+
+    // Definitions
+
+    class CmdDef {
+        def kwd: String;
+        def description: String;
+        def options: Map[String, String];
+        def args: Map[String, String];
+        def numRequiredArgs: Int = -1;
+        def subCmds: Array[SrdRef[CmdDef]];
+        def callback: closure(options: Map[String, String], args: Array[String]);
+        def completionCallback: closure(options: Map[String, String], args: Array[String]);
+        
+        handler this_type(): SrdRef[CmdDef] {
+            return SrdRef[CmdDef].construct();
+        }
+    }
+
+    def cmdDef: SrdRef[CmdDef];
+
+    def progArgPath: String(getThisSourceDirectory[]);
+
+    // Initialization
+
+    function initialize() {
+        initialize(Process.language);
+    }
+
+    function initialize(lang: CharsPtr) {
+        def poContent: String = Fs.readFile(String(getThisSourceDirectory[]) + "I18n/" + lang + ".po");
+        if poContent != "" I18n.addStrings(poContent);
+    }
+
+    // Help Printing Functions
+
+    function printHelp(argStartIndex: Int, localizeCommands: Bool) {
+        def cmd: SrdRef[CmdDef] = cmdDef;
+        def i: Int;
+        for i = argStartIndex, i < Process.argCount - 1, ++i {
+            cmd = findSubCommand(cmd, I18n.string(Process.args~cnt(i)));
+            if cmd.isNull() {
+                System.fail(1, String.format(I18n.string("Command not found: %s"), Process.args~cnt(i)));
+            }
+        }
+        if cmd.obj~ptr == cmdDef.obj~ptr {
+            for i = 0, i < argStartIndex, ++i {
+                Console.print("%s ", Process.args~cnt(i));
+            }
+        }
+        printHelp(cmd, 0, localizeCommands);
+    }
+
+    function printHelp(cmdDef: SrdRef[CmdDef], tabs: Int, localizeCommands: Bool) {
+        indent(2 * tabs);
+        if cmdDef.kwd != "" Console.print(possiblyLocalize(cmdDef.kwd, localizeCommands));
+        if cmdDef.options.getLength() > 0 {
+            Console.print(" [%s]", I18n.string("options").buf);
+        }
+        def i: Int;
+        for i = 0, i < cmdDef.args.getLength(), ++i {
+            if cmdDef.numRequiredArgs >= 0 and i >= cmdDef.numRequiredArgs {
+                Console.print(" [<%s>]", possiblyLocalize(cmdDef.args.keyAt(i), localizeCommands).buf);
+            } else {
+                Console.print(" <%s>", possiblyLocalize(cmdDef.args.keyAt(i), localizeCommands).buf);
+            }
+        }
+        if cmdDef.subCmds.getLength() > 0 {
+            Console.print(" <%s>", I18n.string("subcommands").buf);
+        }
+        Console.print("\n");
+        if cmdDef.description != "" {
+            indent(2 * tabs + 2);
+            printAtColumn(I18n.string(cmdDef.description), 2 * tabs + 2);
+        }
+        if cmdDef.args.getLength() > 0 {
+            indent(2 * tabs);
+            Console.print("* %s:\n", I18n.string("Arguments").buf);
+            for i = 0, i < cmdDef.args.getLength(), ++i {
+                indent(2 * (tabs + 2));
+                printAtColumn(
+                    String("- ") + possiblyLocalize(cmdDef.args.keyAt(i), localizeCommands)
+                    + ": " + I18n.string(cmdDef.args.valAt(i)), 2 * (tabs + 4)
+                );
+            }
+        }
+        if cmdDef.options.getLength() > 0 {
+            indent(2 * tabs);
+            Console.print("* %s:\n", I18n.string("Options").buf);
+            for i = 0, i < cmdDef.options.getLength(), ++i {
+                indent(2 * (tabs + 2));
+                printAtColumn(
+                    String("--") + possiblyLocalize(cmdDef.options.keyAt(i), localizeCommands)
+                    + ": " + I18n.string(cmdDef.options.valAt(i)), 2 * (tabs + 4));
+            }
+        }
+        if cmdDef.subCmds.getLength() > 0 {
+            Console.print("\n");
+            indent(tabs * 2);
+            Console.print("# %s:\n", I18n.string("Subcommands").buf);
+            for i = 0, i < cmdDef.subCmds.getLength(), ++i {
+                Console.print("\n");
+                printHelp(cmdDef.subCmds(i), tabs + 1, localizeCommands);
+            }
+        }
+    }
+
+    function indent(columns: Int) {
+        def i: Int;
+        for i = 0, i < columns, ++i {
+            Console.print(" ");
+        }
+    }
+
+    function printAtColumn(str: String, columns: Int) {
+        def lines: Array[String] = str.split("\n");
+        def i: Int;
+        for i = 0, i < lines.getLength(), ++i {
+            if i != 0 indent(columns);
+            Console.print(lines(i));
+            Console.print("\n");
+        }
+    }
+
+    function possiblyLocalize(str: String, localizeCommands: Bool): String {
+        if localizeCommands {
+            return I18n.string(str);
+        } else {
+            return str;
+        }
+    }
+
+    // Parsing Functions
+
+    function parse(argStartIndex: Int) {
+        if cmdDef.isNull() return;
+
+        // Check if help is requested.
+        def localizedLastArg: String = I18n.string(Process.args~cnt(Process.argCount - 1));
+        if String.compare(localizedLastArg, "--help") == 0 or String.compare(localizedLastArg, "-h") == 0 {
+            printHelp(argStartIndex, localizedLastArg != Process.args~cnt(Process.argCount - 1));
+            return;
+        }
+
+        // Run the commands.
+        def i: Int = parse(cmdDef, argStartIndex);
+        if i < Process.argCount {
+            System.fail(1, String.format(I18n.string("Invalid argument: %s"), Process.args~cnt(i)));
+        }
+    }
+
+    function parse(cmdDef: SrdRef[CmdDef], argStartIndex: Int): Int {
+        def options: Map[String, String];
+        def args: Array[String];
+        def subCmdDef: SrdRef[CmdDef];
+        def i: Int;
+        for i = argStartIndex, i < Process.argCount, ++i {
+            // Compare against options.
+            if String.compare(Process.args~cnt(i), "--", 2) == 0 {
+                def option: Array[String] = String(Process.args~cnt(i) + 2).split("=");
+                def l18nOption: String = I18n.string(option(0));
+                if cmdDef.options(l18nOption) != "" {
+                    options(l18nOption) = option(1);
+                    continue;
+                } else {
+                    if cmdDef.kwd != "" {
+                        System.fail(1, String.format(
+                            I18n.string("Invalid option %s for command %s"), option(0).buf, I18n.string(cmdDef.kwd).buf
+                        ));
+                    } else {
+                        System.fail(1, String.format(I18n.string("Invalid option %s"), option(0).buf));
+                    }
+                }
+            }
+            // Compare against subcommands.
+            subCmdDef = findSubCommand(cmdDef, I18n.string(Process.args~cnt(i)));
+            if !subCmdDef.isNull() break;
+            // Pick up arguments.
+            if args.getLength() < cmdDef.args.getLength() {
+                args.add(String(Process.args~cnt(i)));
+            } else {
+                break;
+            }
+        }
+        // Error if required arguments are missing.
+        def numRequiredArgs: Int = cmdDef.numRequiredArgs;
+        if numRequiredArgs < 0 numRequiredArgs = cmdDef.args.getLength();
+        if args.getLength() < numRequiredArgs {
+            if cmdDef.kwd != "" {
+                System.fail(1, String.format(
+                    I18n.string("Missing required arguments for command: %s"), I18n.string(cmdDef.kwd).buf
+                ));
+            } else {
+                System.fail(1, String.format(I18n.string("Missing required arguments.")));
+            }
+        }
+        cmdDef.callback(options, args);
+        // Parse subcommands.
+        while not subCmdDef.isNull() {
+            i = parse(subCmdDef, i + 1);
+            if i >= Process.argCount break;
+            subCmdDef = findSubCommand(cmdDef, Process.args~cnt(i));
+        }
+        if not cmdDef.completionCallback.isNull() {
+            cmdDef.completionCallback(options, args);
+        }
+        return i;
+    }
+
+    // Helper Functions
+
+    function findSubCommand(cmdDef: SrdRef[CmdDef], kwd: CharsPtr): SrdRef[CmdDef] {
+        def i: Int;
+        for i = 0, i < cmdDef.subCmds.getLength(), ++i {
+            if cmdDef.subCmds(i).kwd == kwd {
+                return cmdDef.subCmds(i);
+            }
+        }
+        return SrdRef[CmdDef]();
+    }
+}

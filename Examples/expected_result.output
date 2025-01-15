@@ -1,0 +1,284 @@
+>>>>>> example.alusus
+
+Error: Missing required arguments.
+
+
+
+>>>>>> example.alusus --help
+
+alusus example.alusus  [options] <arg1> <arg2> <subcommands>
+* Arguments:
+    - arg1: Argument 1.
+        This is description for argument 1.
+    - arg2: Argument 2.
+        This is description for argument 2.
+* Options:
+    --opt1: Option 1.
+        This is description for option 1.
+    --opt2: Option 2
+
+# Subcommands:
+
+  cmd2 [options] <arg1> [<arg2>]
+    Command 2.
+    This is description for command 2.
+  * Arguments:
+      - arg1: Argument 1.
+          This is description for argument 1.
+      - arg2: Argument 2.
+          This is description for argument 2.
+  * Options:
+      --opt1: Option 1.
+          This is description for option 1.
+      --opt2: Option 2.
+          This is description for option 2.
+
+  cmd3 [options] <arg1> [<arg2>] <subcommands>
+    Command 3.
+    This is description for command 3.
+  * Arguments:
+      - arg1: Argument 1.
+          This is description for argument 1.
+      - arg2: Argument 2.
+          This is description for argument 2.
+  * Options:
+      --opt1: Option 1.
+          This is description for option 1.
+      --opt2: Option 2.
+          This is description for option 2.
+
+  # Subcommands:
+
+    cmd3.1 [options] <arg1> [<arg2>]
+      Command 3.1.
+      This is description for command 3.1.
+    * Arguments:
+        - arg1: Argument 1.
+            This is description for argument 1.
+        - arg2: Argument 2.
+            This is description for argument 2.
+    * Options:
+        --opt1: Option 1.
+            This is description for option 1.
+        --opt2: Option 2.
+            This is description for option 2.
+
+  cmd4 <arg1> [<arg2>]
+    Command 4.
+    This is description for command 4.
+  * Arguments:
+      - arg1: Argument 1.
+          This is description for argument 1.
+      - arg2: Argument 2.
+          This is description for argument 2.
+
+  cmd5 [options]
+    Command 5.
+    This is description for command 5.
+  * Options:
+      --opt1: Option 1.
+          This is description for option 1.
+      --opt2: Option 2.
+          This is description for option 2.
+
+
+
+>>>>>> example.alusus cmd2 --help
+
+cmd2 [options] <arg1> [<arg2>]
+  Command 2.
+  This is description for command 2.
+* Arguments:
+    - arg1: Argument 1.
+        This is description for argument 1.
+    - arg2: Argument 2.
+        This is description for argument 2.
+* Options:
+    --opt1: Option 1.
+        This is description for option 1.
+    --opt2: Option 2.
+        This is description for option 2.
+
+
+
+>>>>>> example.alusus cmd3 --help
+
+cmd3 [options] <arg1> [<arg2>] <subcommands>
+  Command 3.
+  This is description for command 3.
+* Arguments:
+    - arg1: Argument 1.
+        This is description for argument 1.
+    - arg2: Argument 2.
+        This is description for argument 2.
+* Options:
+    --opt1: Option 1.
+        This is description for option 1.
+    --opt2: Option 2.
+        This is description for option 2.
+
+# Subcommands:
+
+  cmd3.1 [options] <arg1> [<arg2>]
+    Command 3.1.
+    This is description for command 3.1.
+  * Arguments:
+      - arg1: Argument 1.
+          This is description for argument 1.
+      - arg2: Argument 2.
+          This is description for argument 2.
+  * Options:
+      --opt1: Option 1.
+          This is description for option 1.
+      --opt2: Option 2.
+          This is description for option 2.
+
+
+
+>>>>>> example.alusus cmd3 cmd3.1 --help
+
+cmd3.1 [options] <arg1> [<arg2>]
+  Command 3.1.
+  This is description for command 3.1.
+* Arguments:
+    - arg1: Argument 1.
+        This is description for argument 1.
+    - arg2: Argument 2.
+        This is description for argument 2.
+* Options:
+    --opt1: Option 1.
+        This is description for option 1.
+    --opt2: Option 2.
+        This is description for option 2.
+
+
+
+>>>>>> example.alusus cmd3 unknown --help
+
+Error: Command not found: unknown
+
+
+
+>>>>>> example.alusus cmd4 --help
+
+cmd4 <arg1> [<arg2>]
+  Command 4.
+  This is description for command 4.
+* Arguments:
+    - arg1: Argument 1.
+        This is description for argument 1.
+    - arg2: Argument 2.
+        This is description for argument 2.
+
+
+
+>>>>>> example.alusus cmd5 --help
+
+cmd5 [options]
+  Command 5.
+  This is description for command 5.
+* Options:
+    --opt1: Option 1.
+        This is description for option 1.
+    --opt2: Option 2.
+        This is description for option 2.
+
+
+
+>>>>>> example.alusus unknown --help
+
+Error: Command not found: unknown
+
+
+
+>>>>>> example.alusus arg1
+
+Error: Missing required arguments.
+
+
+
+>>>>>> example.alusus arg1 arg2
+
+root cmd callback
+args[0] = arg1
+args[1] = arg2
+
+
+
+>>>>>> example.alusus --opt1=v1 --opt2=v2 arg1 arg2
+
+root cmd callback
+options[opt1] = v1
+options[opt2] = v2
+args[0] = arg1
+args[1] = arg2
+
+
+
+>>>>>> example.alusus --opt3=v1 arg1 arg2
+
+Error: Invalid option opt3
+
+
+
+>>>>>> example.alusus arg1 arg2 cmd2
+
+root cmd callback
+args[0] = arg1
+args[1] = arg2
+Error: Missing required arguments for command: cmd2
+
+
+
+>>>>>> example.alusus arg1 arg2 cmd2 arg3 arg4
+
+root cmd callback
+args[0] = arg1
+args[1] = arg2
+cmd2 callback
+args[0] = arg3
+args[1] = arg4
+
+
+
+>>>>>> example.alusus arg1 arg2 cmd2 --opt1=v3 arg3 arg4
+
+root cmd callback
+args[0] = arg1
+args[1] = arg2
+cmd2 callback
+options[opt1] = v3
+args[0] = arg3
+args[1] = arg4
+
+
+
+>>>>>> example.alusus arg1 arg2 cmd2 --opt3=v3 arg3 arg4
+
+root cmd callback
+args[0] = arg1
+args[1] = arg2
+Error: Invalid option opt3 for command cmd2
+
+
+
+>>>>>> example.alusus arg1 arg2 cmd4 --opt1=v3 arg3 arg4
+
+root cmd callback
+args[0] = arg1
+args[1] = arg2
+Error: Invalid option opt1 for command cmd4
+
+
+
+>>>>>> example.alusus arg1 arg2 cmd5 --opt1=v3 arg3 arg4
+
+root cmd callback
+args[0] = arg1
+args[1] = arg2
+cmd5 callback
+options[opt1] = v3
+Error: Invalid argument: arg3
+
+
+

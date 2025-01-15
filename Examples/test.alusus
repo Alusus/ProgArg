@@ -1,0 +1,53 @@
+import "Srl/System";
+import "Srl/Fs";
+import "Srl/Console";
+import "Srl/Array";
+import "Srl/String";
+
+use Srl;
+
+// TODO: Add Arabic examples.
+
+def commands: Array[String]({
+    String("example.alusus"),
+    String("example.alusus --help"),
+    String("example.alusus cmd2 --help"),
+    String("example.alusus cmd3 --help"),
+    String("example.alusus cmd3 cmd3.1 --help"),
+    String("example.alusus cmd3 unknown --help"),
+    String("example.alusus cmd4 --help"),
+    String("example.alusus cmd5 --help"),
+    String("example.alusus unknown --help"),
+    String("example.alusus arg1"),
+    String("example.alusus arg1 arg2"),
+    String("example.alusus --opt1=v1 --opt2=v2 arg1 arg2"),
+    String("example.alusus --opt3=v1 arg1 arg2"),
+    String("example.alusus arg1 arg2 cmd2"),
+    String("example.alusus arg1 arg2 cmd2 arg3 arg4"),
+    String("example.alusus arg1 arg2 cmd2 --opt1=v3 arg3 arg4"),
+    String("example.alusus arg1 arg2 cmd2 --opt3=v3 arg3 arg4"),
+    String("example.alusus arg1 arg2 cmd4 --opt1=v3 arg3 arg4"),
+    String("example.alusus arg1 arg2 cmd5 --opt1=v3 arg3 arg4"),
+});
+
+def i: Int;
+for i = 0, i < commands.getLength(), ++i {
+    Console.print("Running: %s\n", commands(i).buf);
+    if i == 0 {
+        System.exec(String("echo \">>>>>> ") + commands(i) + "\\n\" > result.output");
+    } else {
+        System.exec(String("echo \">>>>>> ") + commands(i) + "\\n\" >> result.output");
+    }
+    System.exec(String("alusus ") + commands(i) + String(" >> result.output"));
+    System.exec("echo \"\\n\\n\" >> result.output");
+}
+
+def received: String = Fs.readFile("result.output");
+def expected: String = Fs.readFile("expected_result.output");
+
+if received == expected {
+    Console.print("Test successful,\n");
+} else {
+    Console.print("Test failed,\n");
+}
+

@@ -1,0 +1,115 @@
+import "Apm";
+Apm.importFile("Alusus/ProgArg");
+
+use Srl;
+
+function printArgs(args: Array[String]) {
+    def i: Int;
+    for i = 0, i < args.getLength(), ++i {
+        Console.print("args[%d] = %s\n", i, args(i).buf);
+    }
+}
+
+function printOptions(options: Map[String, String]) {
+    def i: Int;
+    for i = 0, i < options.getLength(), ++i {
+        Console.print("options[%s] = %s\n", options.keyAt(i).buf, options.valAt(i).buf);
+    }
+}
+
+def poContent: String = Fs.readFile(String(getThisSourceDirectory[]) + Process.language + ".po");
+if poContent != "" I18n.addStrings(poContent);
+
+ProgArg.initialize();
+ProgArg.cmdDef = ProgArg.CmdDef().{
+    args = Map[String, String]()
+        .set(String("arg1"), String("Argument 1.\nThis is description for argument 1."))
+        .set(String("arg2"), String("Argument 2.\nThis is description for argument 2."));
+    options = Map[String, String]()
+        .set(String("opt1"), String("Option 1.\nThis is description for option 1."))
+        .set(String("opt2"), String("Option 2"));
+    callback = closure (options: Map[String, String], args: Array[String]) {
+        Console.print("root cmd callback\n");
+        printOptions(options);
+        printArgs(args);
+    };
+
+    subCmds = Array[SrdRef[ProgArg.CmdDef]]({
+        ProgArg.CmdDef().{
+            kwd = "cmd2";
+            description = "Command 2.\nThis is description for command 2.";
+            args = Map[String, String]()
+                .set(String("arg1"), String("Argument 1.\nThis is description for argument 1."))
+                .set(String("arg2"), String("Argument 2.\nThis is description for argument 2."));
+            numRequiredArgs = 1;
+            options = Map[String, String]()
+                .set(String("opt1"), String("Option 1.\nThis is description for option 1."))
+                .set(String("opt2"), String("Option 2.\nThis is description for option 2."));
+            callback = closure (options: Map[String, String], args: Array[String]) {
+                Console.print("cmd2 callback\n");
+                printOptions(options);
+                printArgs(args);
+            };
+        },
+        ProgArg.CmdDef().{
+            kwd = "cmd3";
+            description = "Command 3.\nThis is description for command 3.";
+            args = Map[String, String]()
+                .set(String("arg1"), String("Argument 1.\nThis is description for argument 1."))
+                .set(String("arg2"), String("Argument 2.\nThis is description for argument 2."));
+            numRequiredArgs = 1;
+            options = Map[String, String]()
+                .set(String("opt1"), String("Option 1.\nThis is description for option 1."))
+                .set(String("opt2"), String("Option 2.\nThis is description for option 2."));
+            callback = closure (options: Map[String, String], args: Array[String]) {
+                Console.print("cmd3 callback\n");
+                printOptions(options);
+                printArgs(args);
+            };
+            
+            subCmds = Array[SrdRef[ProgArg.CmdDef]]({
+                ProgArg.CmdDef().{
+                    kwd = "cmd3.1";
+                    description = "Command 3.1.\nThis is description for command 3.1.";
+                    args = Map[String, String]()
+                        .set(String("arg1"), String("Argument 1.\nThis is description for argument 1."))
+                        .set(String("arg2"), String("Argument 2.\nThis is description for argument 2."));
+                    numRequiredArgs = 1;
+                    options = Map[String, String]()
+                        .set(String("opt1"), String("Option 1.\nThis is description for option 1."))
+                        .set(String("opt2"), String("Option 2.\nThis is description for option 2."));
+                    callback = closure (options: Map[String, String], args: Array[String]) {
+                        Console.print("cmd3.1 callback\n");
+                        printOptions(options);
+                        printArgs(args);
+                    };
+                },
+            });
+        },
+        ProgArg.CmdDef().{
+            kwd = "cmd4";
+            description = "Command 4.\nThis is description for command 4.";
+            args = Map[String, String]()
+                .set(String("arg1"), String("Argument 1.\nThis is description for argument 1."))
+                .set(String("arg2"), String("Argument 2.\nThis is description for argument 2."));
+            numRequiredArgs = 1;
+            callback = closure (options: Map[String, String], args: Array[String]) {
+                Console.print("cmd4 callback\n");
+                printArgs(args);
+            };
+        },
+        ProgArg.CmdDef().{
+            kwd = "cmd5";
+            description = "Command 5.\nThis is description for command 5.";
+            options = Map[String, String]()
+                .set(String("opt1"), String("Option 1.\nThis is description for option 1."))
+                .set(String("opt2"), String("Option 2.\nThis is description for option 2."));
+            callback = closure (options: Map[String, String], args: Array[String]) {
+                Console.print("cmd5 callback\n");
+                printOptions(options);
+            };
+        },
+    });
+};
+
+ProgArg.parse(2);
