@@ -33,6 +33,11 @@ ProgArg.cmdDef = ProgArg.CmdDef().{
         printOptions(options);
         printArgs(args);
     };
+    startCallback = closure (options: Map[String, String], args: Array[String]) {
+        Console.print("root cmd start\n");
+        printOptions(options);
+        printArgs(args);
+    };
 
     subCmds = Array[SrdRef[ProgArg.CmdDef]]({
         ProgArg.CmdDef().{
@@ -63,6 +68,16 @@ ProgArg.cmdDef = ProgArg.CmdDef().{
                 .set(String("opt2"), String("Option 2.\nThis is description for option 2."));
             callback = closure (options: Map[String, String], args: Array[String]) {
                 Console.print("cmd3 callback\n");
+                printOptions(options);
+                printArgs(args);
+            };
+            startCallback = closure (options: Map[String, String], args: Array[String]) {
+                Console.print("cmd3 begin\n");
+                printOptions(options);
+                printArgs(args);
+            };
+            endCallback = closure (options: Map[String, String], args: Array[String]) {
+                Console.print("cmd3 end\n");
                 printOptions(options);
                 printArgs(args);
             };

@@ -21,7 +21,8 @@ module ProgArg {
         def numRequiredArgs: Int = -1;
         def subCmds: Array[SrdRef[CmdDef]];
         def callback: closure(options: Map[String, String], args: Array[String]);
-        def completionCallback: closure(options: Map[String, String], args: Array[String]);
+        def startCallback: closure(options: Map[String, String], args: Array[String]);
+        def endCallback: closure(options: Map[String, String], args: Array[String]);
         
         handler this_type(): SrdRef[CmdDef] {
             return SrdRef[CmdDef].construct();
@@ -29,8 +30,6 @@ module ProgArg {
     }
 
     def cmdDef: SrdRef[CmdDef];
-
-    def progArgPath: String(getThisSourceDirectory[]);
 
     // Initialization
 
@@ -170,7 +169,10 @@ module ProgArg {
             if String.compare(Process.args~cnt(i), "--", 2) == 0 {
                 def option: Array[String] = String(Process.args~cnt(i) + 2).split("=");
                 def l18nOption: String = I18n.string(option(0));
-                if cmdDef.options(l18nOption) != "" {
+                if cmdDef.options(option(0)) != "" {
+                    options(option(0)) = option(1);
+                    continue;
+                } else if cmdDef.options(l18nOption) != "" {
                     options(l18nOption) = option(1);
                     continue;
                 } else {
@@ -184,7 +186,8 @@ module ProgArg {
                 }
             }
             // Compare against subcommands.
-            subCmdDef = findSubCommand(cmdDef, I18n.string(Process.args~cnt(i)));
+            subCmdDef = findSubCommand(cmdDef, Process.args~cnt(i));
+            if subCmdDef.isNull() subCmdDef = findSubCommand(cmdDef, I18n.string(Process.args~cnt(i)));
             if !subCmdDef.isNull() break;
             // Pick up arguments.
             if args.getLength() < cmdDef.args.getLength() {
@@ -205,15 +208,22 @@ module ProgArg {
                 System.fail(1, String.format(I18n.string("Missing required arguments.")));
             }
         }
-        cmdDef.callback(options, args);
-        // Parse subcommands.
-        while not subCmdDef.isNull() {
-            i = parse(subCmdDef, i + 1);
-            if i >= Process.argCount break;
-            subCmdDef = findSubCommand(cmdDef, Process.args~cnt(i));
-        }
-        if not cmdDef.completionCallback.isNull() {
-            cmdDef.completionCallback(options, args);
+        // Run callback, or parse subcommands.
+        if subCmdDef.isNull() {
+            if not cmdDef.callback.isNull() cmdDef.callback(options, args);
+        } else {
+            // Parse subcommands.
+            if not cmdDef.startCallback.isNull() {
+                cmdDef.startCallback(options, args);
+            }
+            while not subCmdDef.isNull() {
+                i = parse(subCmdDef, i + 1);
+                if i >= Process.argCount break;
+                subCmdDef = findSubCommand(cmdDef, Process.args~cnt(i));
+            }
+            if not cmdDef.endCallback.isNull() {
+                cmdDef.endCallback(options, args);
+            }
         }
         return i;
     }

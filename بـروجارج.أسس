@@ -11,9 +11,13 @@
         عرف عدد_المعطيات_الإلزامية: لقب numRequiredArgs؛
         عرف الأوامر_الفرعية: لقب subCmds؛
         عرف معالج_التنفيذ: لقب callback؛
-        عرف معالج_الإكمال: لقب completionCallback؛
+        عرف معالج_البدء: لقب startCallback؛
+        عرف معالج_الانتهاء: لقب endCallback؛
     }
 
-    عرف إطبع_المساعدة: لقب printHelp؛
+    عرف تعريف_الأمر: لقب cmdDef؛
+
+    عرف هيئ: لقب initialize؛
+    عرف اطبع_المساعدة: لقب printHelp؛
     عرف حلل: لقب parse؛
 }

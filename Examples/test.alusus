@@ -26,8 +26,18 @@ def commands: Array[String]({
     String("example.alusus arg1 arg2 cmd2 arg3 arg4"),
     String("example.alusus arg1 arg2 cmd2 --opt1=v3 arg3 arg4"),
     String("example.alusus arg1 arg2 cmd2 --opt3=v3 arg3 arg4"),
+    String("example.alusus arg1 arg2 cmd3 arg3"),
+    String("example.alusus arg1 arg2 cmd3 arg3 cmd3.1 arg4"),
     String("example.alusus arg1 arg2 cmd4 --opt1=v3 arg3 arg4"),
     String("example.alusus arg1 arg2 cmd5 --opt1=v3 arg3 arg4"),
+});
+def arCommands: Array[String]({
+    String("example.alusus"),
+    String("example.alusus --help"),
+    String("example.alusus --مساعدة"),
+    String("example.alusus arg1 arg2 أمر2 --خيار1=v3 arg3 arg4"),
+    String("مثال.أسس --help"),
+    String("مثال.أسس --خيار1=خيار معطى1 معطى2"),
 });
 
 def i: Int;
@@ -38,7 +48,13 @@ for i = 0, i < commands.getLength(), ++i {
     } else {
         System.exec(String("echo \">>>>>> ") + commands(i) + "\\n\" >> result.output");
     }
-    System.exec(String("alusus ") + commands(i) + String(" >> result.output"));
+    System.exec(String("LANGUAGE=en alusus ") + commands(i) + String(" >> result.output"));
+    System.exec("echo \"\\n\\n\" >> result.output");
+}
+for i = 0, i < arCommands.getLength(), ++i {
+    Console.print("Running: %s\n", arCommands(i).buf);
+    System.exec(String("echo \">>>>>> ") + arCommands(i) + "\\n\" >> result.output");
+    System.exec(String("LANGUAGE=ar alusus ") + arCommands(i) + String(" >> result.output"));
     System.exec("echo \"\\n\\n\" >> result.output");
 }
 
@@ -50,4 +66,3 @@ if received == expected {
 } else {
     Console.print("Test failed,\n");
 }
-
