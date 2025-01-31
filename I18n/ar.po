@@ -35,6 +35,3 @@ msgstr "معطيات مطلوبة مفقودة للأمر: %s"
 
 msgid "Missing required arguments."
 msgstr "معطيات مطلوبة مفقودة."
-
-msgid "--مساعدة"
-msgstr "--help"

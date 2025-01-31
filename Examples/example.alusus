@@ -18,7 +18,9 @@ function printOptions(options: Map[String, String]) {
 }
 
 def poContent: String = Fs.readFile(String(getThisSourceDirectory[]) + Process.language + ".po");
-if poContent != "" I18n.addStrings(poContent);
+if poContent != "" ProgArg.i18nOut.add(poContent);
+poContent = Fs.readFile(String(getThisSourceDirectory[]) + Process.language + "_in.po");
+if poContent != "" ProgArg.i18nIn.add(poContent);
 
 ProgArg.initialize();
 ProgArg.cmdDef = ProgArg.CmdDef().{

@@ -30,6 +30,8 @@ module ProgArg {
     }
 
     def cmdDef: SrdRef[CmdDef];
+    def i18nOut: I18n.Dictionary;
+    def i18nIn: I18n.Dictionary;
 
     // Initialization
 
@@ -39,18 +41,20 @@ module ProgArg {
 
     function initialize(lang: CharsPtr) {
         def poContent: String = Fs.readFile(String(getThisSourceDirectory[]) + "I18n/" + lang + ".po");
-        if poContent != "" I18n.addStrings(poContent);
+        if poContent != "" i18nOut.add(poContent);
+        poContent = Fs.readFile(String(getThisSourceDirectory[]) + "I18n/" + lang + "_in.po");
+        if poContent != "" i18nIn.add(poContent);
     }
 
     // Help Printing Functions
 
-    function printHelp(argStartIndex: Int, localizeCommands: Bool) {
+    function printHelp(argStartIndex: Int) {
         def cmd: SrdRef[CmdDef] = cmdDef;
         def i: Int;
         for i = argStartIndex, i < Process.argCount - 1, ++i {
-            cmd = findSubCommand(cmd, I18n.string(Process.args~cnt(i)));
+            cmd = findSubCommand(cmd, i18nIn(Process.args~cnt(i)));
             if cmd.isNull() {
-                System.fail(1, String.format(I18n.string("Command not found: %s"), Process.args~cnt(i)));
+                System.fail(1, String.format(i18nOut("Command not found: %s"), Process.args~cnt(i)));
             }
         }
         if cmd.obj~ptr == cmdDef.obj~ptr {
@@ -58,59 +62,59 @@ module ProgArg {
                 Console.print("%s ", Process.args~cnt(i));
             }
         }
-        printHelp(cmd, 0, localizeCommands);
+        printHelp(cmd, 0);
     }
 
-    function printHelp(cmdDef: SrdRef[CmdDef], tabs: Int, localizeCommands: Bool) {
+    function printHelp(cmdDef: SrdRef[CmdDef], tabs: Int) {
         indent(2 * tabs);
-        if cmdDef.kwd != "" Console.print(possiblyLocalize(cmdDef.kwd, localizeCommands));
+        if cmdDef.kwd != "" Console.print(getLocalizedKwd(cmdDef.kwd));
         if cmdDef.options.getLength() > 0 {
-            Console.print(" [%s]", I18n.string("options").buf);
+            Console.print(" [%s]", i18nOut("options").buf);
         }
         def i: Int;
         for i = 0, i < cmdDef.args.getLength(), ++i {
             if cmdDef.numRequiredArgs >= 0 and i >= cmdDef.numRequiredArgs {
-                Console.print(" [<%s>]", possiblyLocalize(cmdDef.args.keyAt(i), localizeCommands).buf);
+                Console.print(" [<%s>]", i18nOut(cmdDef.args.keyAt(i)).buf);
             } else {
-                Console.print(" <%s>", possiblyLocalize(cmdDef.args.keyAt(i), localizeCommands).buf);
+                Console.print(" <%s>", i18nOut(cmdDef.args.keyAt(i)).buf);
             }
         }
         if cmdDef.subCmds.getLength() > 0 {
-            Console.print(" <%s>", I18n.string("subcommands").buf);
+            Console.print(" <%s>", i18nOut("subcommands").buf);
         }
         Console.print("\n");
         if cmdDef.description != "" {
             indent(2 * tabs + 2);
-            printAtColumn(I18n.string(cmdDef.description), 2 * tabs + 2);
+            printAtColumn(i18nOut(cmdDef.description), 2 * tabs + 2);
         }
         if cmdDef.args.getLength() > 0 {
             indent(2 * tabs);
-            Console.print("* %s:\n", I18n.string("Arguments").buf);
+            Console.print("* %s:\n", i18nOut("Arguments").buf);
             for i = 0, i < cmdDef.args.getLength(), ++i {
                 indent(2 * (tabs + 2));
                 printAtColumn(
-                    String("- ") + possiblyLocalize(cmdDef.args.keyAt(i), localizeCommands)
-                    + ": " + I18n.string(cmdDef.args.valAt(i)), 2 * (tabs + 4)
+                    String("- ") + i18nOut(cmdDef.args.keyAt(i))
+                    + ": " + i18nOut(cmdDef.args.valAt(i)), 2 * (tabs + 4)
                 );
             }
         }
         if cmdDef.options.getLength() > 0 {
             indent(2 * tabs);
-            Console.print("* %s:\n", I18n.string("Options").buf);
+            Console.print("* %s:\n", i18nOut("Options").buf);
             for i = 0, i < cmdDef.options.getLength(), ++i {
                 indent(2 * (tabs + 2));
                 printAtColumn(
-                    String("--") + possiblyLocalize(cmdDef.options.keyAt(i), localizeCommands)
-                    + ": " + I18n.string(cmdDef.options.valAt(i)), 2 * (tabs + 4));
+                    String("--") + getLocalizedKwd(cmdDef.options.keyAt(i))
+                    + ": " + i18nOut(cmdDef.options.valAt(i)), 2 * (tabs + 4));
             }
         }
         if cmdDef.subCmds.getLength() > 0 {
             Console.print("\n");
             indent(tabs * 2);
-            Console.print("# %s:\n", I18n.string("Subcommands").buf);
+            Console.print("# %s:\n", i18nOut("Subcommands").buf);
             for i = 0, i < cmdDef.subCmds.getLength(), ++i {
                 Console.print("\n");
-                printHelp(cmdDef.subCmds(i), tabs + 1, localizeCommands);
+                printHelp(cmdDef.subCmds(i), tabs + 1);
             }
         }
     }
@@ -132,12 +136,10 @@ module ProgArg {
         }
     }
 
-    function possiblyLocalize(str: String, localizeCommands: Bool): String {
-        if localizeCommands {
-            return I18n.string(str);
-        } else {
-            return str;
-        }
+    function getLocalizedKwd(kwd: String): String {
+        def lKwd: String = i18nOut(kwd);
+        if lKwd == kwd return kwd
+        else return lKwd + "|" + kwd;
     }
 
     // Parsing Functions
@@ -146,16 +148,16 @@ module ProgArg {
         if cmdDef.isNull() return;
 
         // Check if help is requested.
-        def localizedLastArg: String = I18n.string(Process.args~cnt(Process.argCount - 1));
+        def localizedLastArg: String = i18nIn(Process.args~cnt(Process.argCount - 1));
         if String.compare(localizedLastArg, "--help") == 0 or String.compare(localizedLastArg, "-h") == 0 {
-            printHelp(argStartIndex, localizedLastArg != Process.args~cnt(Process.argCount - 1));
+            printHelp(argStartIndex);
             return;
         }
 
         // Run the commands.
         def i: Int = parse(cmdDef, argStartIndex);
         if i < Process.argCount {
-            System.fail(1, String.format(I18n.string("Invalid argument: %s"), Process.args~cnt(i)));
+            System.fail(1, String.format(i18nOut("Invalid argument: %s"), Process.args~cnt(i)));
         }
     }
 
@@ -168,26 +170,22 @@ module ProgArg {
             // Compare against options.
             if String.compare(Process.args~cnt(i), "--", 2) == 0 {
                 def option: Array[String] = String(Process.args~cnt(i) + 2).split("=");
-                def l18nOption: String = I18n.string(option(0));
-                if cmdDef.options(option(0)) != "" {
-                    options(option(0)) = option(1);
-                    continue;
-                } else if cmdDef.options(l18nOption) != "" {
-                    options(l18nOption) = option(1);
+                def optionKwd: String = i18nIn(option(0));
+                if cmdDef.options(optionKwd) != "" {
+                    options(optionKwd) = option(1);
                     continue;
                 } else {
                     if cmdDef.kwd != "" {
                         System.fail(1, String.format(
-                            I18n.string("Invalid option %s for command %s"), option(0).buf, I18n.string(cmdDef.kwd).buf
+                            i18nOut("Invalid option %s for command %s"), option(0).buf, getLocalizedKwd(cmdDef.kwd).buf
                         ));
                     } else {
-                        System.fail(1, String.format(I18n.string("Invalid option %s"), option(0).buf));
+                        System.fail(1, String.format(i18nOut("Invalid option %s"), option(0).buf));
                     }
                 }
             }
             // Compare against subcommands.
-            subCmdDef = findSubCommand(cmdDef, Process.args~cnt(i));
-            if subCmdDef.isNull() subCmdDef = findSubCommand(cmdDef, I18n.string(Process.args~cnt(i)));
+            subCmdDef = findSubCommand(cmdDef, i18nIn(Process.args~cnt(i)));
             if !subCmdDef.isNull() break;
             // Pick up arguments.
             if args.getLength() < cmdDef.args.getLength() {
@@ -202,10 +200,10 @@ module ProgArg {
         if args.getLength() < numRequiredArgs {
             if cmdDef.kwd != "" {
                 System.fail(1, String.format(
-                    I18n.string("Missing required arguments for command: %s"), I18n.string(cmdDef.kwd).buf
+                    i18nOut("Missing required arguments for command: %s"), getLocalizedKwd(cmdDef.kwd).buf
                 ));
             } else {
-                System.fail(1, String.format(I18n.string("Missing required arguments.")));
+                System.fail(1, String.format(i18nOut("Missing required arguments.")));
             }
         }
         // Run callback, or parse subcommands.
@@ -219,7 +217,7 @@ module ProgArg {
             while not subCmdDef.isNull() {
                 i = parse(subCmdDef, i + 1);
                 if i >= Process.argCount break;
-                subCmdDef = findSubCommand(cmdDef, Process.args~cnt(i));
+                subCmdDef = findSubCommand(cmdDef, i18nIn(Process.args~cnt(i)));
             }
             if not cmdDef.endCallback.isNull() {
                 cmdDef.endCallback(options, args);

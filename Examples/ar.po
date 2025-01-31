@@ -6,17 +6,11 @@ msgstr ""
 msgid "arg1"
 msgstr "معطى1"
 
-msgid "معطى1"
-msgstr "arg1"
-
 msgid "Argument 1.\nThis is description for argument 1."
 msgstr "المعطى 1.\nهذا وصف المعطى 1."
 
 msgid "arg2"
 msgstr "معطى2"
-
-msgid "معطى2"
-msgstr "arg2"
 
 msgid "Argument 2.\nThis is description for argument 2."
 msgstr "المعطى 2.\nهذا وصف المعطى 2."
@@ -24,17 +18,11 @@ msgstr "المعطى 2.\nهذا وصف المعطى 2."
 msgid "opt1"
 msgstr "خيار1"
 
-msgid "خيار1"
-msgstr "opt1"
-
 msgid "Option 1.\nThis is description for option 1."
 msgstr "الخيار 1.\nهذا وصف الخيار 1."
 
 msgid "opt2"
 msgstr "خيار2"
-
-msgid "خيار2"
-msgstr "opt2"
 
 msgid "Option 2"
 msgstr "الخيار 2"
@@ -45,17 +33,11 @@ msgstr "الخيار 2.\nهذا وصف الخيار 2."
 msgid "cmd2"
 msgstr "أمر2"
 
-msgid "أمر2"
-msgstr "cmd2"
-
 msgid "Command 2.\nThis is description for command 2."
 msgstr "الأمر 2.\nهذا وصف الأمر 2."
 
 msgid "cmd3"
 msgstr "أمر3"
-
-msgid "أمر3"
-msgstr "cmd3"
 
 msgid "Command 3.\nThis is description for command 3."
 msgstr "الأمر 3.\nهذا وصف الأمر 3."
@@ -63,26 +45,17 @@ msgstr "الأمر 3.\nهذا وصف الأمر 3."
 msgid "cmd3.1"
 msgstr "أمر3.1"
 
-msgid "أمر3.1"
-msgstr "cmd3.1"
-
 msgid "Command 3.1.\nThis is description for command 3.1."
 msgstr "الأمر 3.1.\nهذا وصف الأمر 3.1."
 
 msgid "cmd4"
 msgstr "أمر4"
 
-msgid "أمر4"
-msgstr "cmd4"
-
 msgid "Command 4.\nThis is description for command 4."
 msgstr "الأمر 4.\nهذا وصف الأمر 4."
 
 msgid "cmd5"
 msgstr "أمر5"
-
-msgid "أمر5"
-msgstr "cmd5"
 
 msgid "Command 5.\nThis is description for command 5."
 msgstr "الأمر 5.\nهذا وصف الأمر 5."

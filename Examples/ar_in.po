@@ -1,0 +1,31 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ar\n"
+
+msgid "معطى1"
+msgstr "arg1"
+
+msgid "معطى2"
+msgstr "arg2"
+
+msgid "خيار1"
+msgstr "opt1"
+
+msgid "خيار2"
+msgstr "opt2"
+
+msgid "أمر2"
+msgstr "cmd2"
+
+msgid "أمر3"
+msgstr "cmd3"
+
+msgid "أمر3.1"
+msgstr "cmd3.1"
+
+msgid "أمر4"
+msgstr "cmd4"
+
+msgid "أمر5"
+msgstr "cmd5"
