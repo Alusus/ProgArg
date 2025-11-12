@@ -50,6 +50,7 @@ class CmdDef {
     def endCallback: closure(options: Map[String, String], args: Array[String]);
     
     handler this_type(): SrdRef[CmdDef];
+    handler this.findSubCmd(kwd: CharsPtr): SrdRef[CmdDef];
 }
 ```
 
@@ -65,6 +66,11 @@ class CmdDef {
 - `callback`: A closure function invoked when the command is executed, assuming it has no subcommands.
 - `startCallback`: A closure function invoked before processing subcommands.
 - `endCallback`: A closure function invoked after processing subcommands.
+
+#### Methods
+
+- `findSubCmd(kwd: CharsPtr)`: Searches for a subcommand with the given keyword and returns a reference to it.
+  Returns an empty reference if no matching subcommand is found.
 
 ---
 
@@ -83,12 +89,26 @@ this command is ignored, and its argument, option, and subcommand definitions ar
 
 ```
 function initialize();
-function initialize(lang: CharsPtr);
+function initialize(lang: String);
+function initialize(lang: String, localizationsPath: String);
 ```
 
-Initializes the library and loads localized translations. The first version of this function uses
-the system's current language. This function must be called at the beginning of the program before
-using other functions.
+Initializes the library and loads localized translations. The first version uses the system's current 
+language automatically. The second version allows specifying a custom language. The third version allows 
+specifying both a custom language and a custom path to the localization files. The first and the second
+versions of this function embeds the localizations into the executable during compilation, whereas the
+third one loads them at run time.
+This function must be called at the beginning of the program before using other functions.
+
+### `getLocalizationsPath`
+
+```
+function getLocalizationsPath(): String;
+```
+
+Returns the path to the localization files included with this library. This is typically used internally but
+it can be used for cases where the user doesn't want to embed the translations into the execcutable and wants
+instead to ship the localization files with the generated build.
 
 ### `printHelp`
 

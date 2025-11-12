@@ -13,6 +13,7 @@
         عرف معالج_التنفيذ: لقب callback؛
         عرف معالج_البدء: لقب startCallback؛
         عرف معالج_الانتهاء: لقب endCallback؛
+        عرف جد_أمرا_فرعيا: لقب findSubCmd؛
     }
 
     عرف تعريف_الأمر: لقب cmdDef؛
@@ -20,6 +21,7 @@
     عرف نص_دخل: لقب i18nIn؛
 
     عرف هيئ: لقب initialize؛
+    عرف هات_مسار_الترجمات: لقب getLocalizationsPath؛
     عرف اطبع_المساعدة: لقب printHelp؛
     عرف حلل: لقب parse؛
 }

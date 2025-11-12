@@ -27,6 +27,14 @@ module ProgArg {
         handler this_type(): SrdRef[CmdDef] {
             return SrdRef[CmdDef].construct();
         }
+
+        handler this.findSubCmd(kwd: CharsPtr): SrdRef[CmdDef] {
+            def i: Int;
+            for i = 0, i < this.subCmd.getLength(), ++i {
+                if this.subCmd(i).kwd == kwd return this.subCmd(i);
+            }
+            return SrdRef[CmdDef]();
+        }
     }
 
     def cmdDef: SrdRef[CmdDef];
@@ -36,14 +44,34 @@ module ProgArg {
     // Initialization
 
     function initialize() {
-        initialize(Process.language);
+        initialize(String(1, Process.language));
     }
 
-    function initialize(lang: CharsPtr) {
-        def poContent: String = Fs.readFile(String(getThisSourceDirectory[]) + "I18n/" + lang + ".po");
+    function initialize(lang: String) {
+        def localizationPath: preprocess {
+            def dummy: 1;
+            Spp.astMgr.insertAst(
+                ast { "{{name}}/I18n" },
+                Srl.Map[Srl.String, ref[Core.Basic.TiObject]]()
+                    .set(Srl.String("name"), Core.Basic.TiStr(Spp.astMgr.getSourceDirectoryForElement(dummy~ast)))
+            );
+        };
+        def textAssets: I18n.TextAssets[localizationPath, "en"];
+        textAssets.initialize();
+        textAssets.setCurrentLanguage(lang);
+        i18nOut.add(textAssets.current.outputs);
+        i18nIn.add(textAssets.current.inputs);
+    }
+
+    function initialize(lang: String, localizationsPath: String) {
+        def poContent: String = Fs.readFile(localizationsPath + lang + ".po");
         if poContent != "" i18nOut.add(poContent);
-        poContent = Fs.readFile(String(getThisSourceDirectory[]) + "I18n/" + lang + "_in.po");
+        poContent = Fs.readFile(localizationsPath + lang + "_in.po");
         if poContent != "" i18nIn.add(poContent);
+    }
+
+    function getLocalizationsPath(): String {
+        return String(getThisSourceDirectory[]) + "I18n/";
     }
 
     // Help Printing Functions
