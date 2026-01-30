@@ -1,5 +1,5 @@
 # ProgArg
-[[English]](readme.md)
+[[English]](README.md)
 
 <div dir=rtl>
 

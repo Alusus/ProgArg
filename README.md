@@ -1,5 +1,5 @@
 # ProgArg
-[[العربية]](readme.ar.md)
+[[العربية]](README.ar.md)
 
 ## Overview
 
