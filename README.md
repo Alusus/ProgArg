@@ -191,3 +191,9 @@ All texts can be localized using the `I18n` module. The `localizeCommands` param
 names, and argument names are localized when generating help messages with functions like `printHelp` and
 `printCmdHelp`.
 
+---
+
+## License
+
+This project is licensed under the GNU Lesser General Public License v3.0 (LGPL-3.0). See the `COPYING` and `COPYING.LESSER` files for details.
+
