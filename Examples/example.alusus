@@ -1,5 +1,5 @@
 import "Apm";
-Apm.importFile("Alusus/ProgArg");
+Apm.importPackage("Alusus/ProgArg@0.2");
 
 use Srl;
 
