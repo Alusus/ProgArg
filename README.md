@@ -53,17 +53,60 @@ class CmdDef {
 }
 ```
 
-#### Properties
+#### kwd
+```
+def kwd: String;
+```
+The keyword that identifies the command.
 
-* `kwd` (`String`): The keyword that identifies the command.
-* `description` (`String`): A brief description of the command.
-* `options` (`Map[String, String]`): A list of option names and their descriptions.
-* `args` (`Map[String, String]`): A list of argument names and their descriptions.
-* `numRequiredArgs` (`Int`): The number of required arguments. If set to `-1` (default), all arguments are considered required.
-* `subCmds` (`Array[SrdRef[CmdDef]]`): An array of subcommands defined under this command.
-* `callback` (`closure`): A closure function invoked when the command is executed, assuming it has no subcommands.
-* `startCallback` (`closure`): A closure function invoked before processing subcommands.
-* `endCallback` (`closure`): A closure function invoked after processing subcommands.
+#### description
+```
+def description: String;
+```
+A brief description of the command.
+
+#### options
+```
+def options: Map[String, String];
+```
+A list of option names and their descriptions.
+
+#### args
+```
+def args: Map[String, String];
+```
+A list of argument names and their descriptions.
+
+#### numRequiredArgs
+```
+def numRequiredArgs: Int = -1;
+```
+The number of required arguments. If set to `-1` (default), all arguments are considered required.
+
+#### subCmds
+```
+def subCmds: Array[SrdRef[CmdDef]];
+```
+An array of subcommands defined under this command.
+
+#### callback
+```
+def callback: closure(options: Map[String, String], args: Array[String]);
+```
+A closure function invoked when the command is executed, assuming it has no subcommands.
+
+#### startCallback
+```
+def startCallback: closure(options: Map[String, String], args: Array[String]);
+```
+A closure function invoked before processing subcommands.
+
+#### endCallback
+```
+def endCallback: closure(options: Map[String, String], args: Array[String]);
+```
+A closure function invoked after processing subcommands.
+
 
 #### findSubCmd
 
