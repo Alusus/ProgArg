@@ -1,4 +1,5 @@
 # ProgArg
+
 [[العربية]](README.ar.md)
 
 ## Overview
@@ -9,8 +10,6 @@ command structures, options, and arguments, as well as built-in localization.
 
 ## Features
 
-
-
 * **Command Definition**: Define commands with keywords, descriptions, options, and arguments.
 * **Subcommands**: Support for hierarchical command structures.
 * **Localization**: Built-in internationalization support using `Alusus/I18n`.
@@ -19,8 +18,6 @@ command structures, options, and arguments, as well as built-in localization.
 * **Error Handling**: Handles errors related to incorrect or missing arguments.
 
 ## Adding to a Project
-
-
 
 ```
 import "Apm";
@@ -31,11 +28,10 @@ Once the library is added to the project, its definitions will be available unde
 
 ## Classes
 
-
-
 ### CmdDef
 
 Defines a command and its associated metadata.
+
 ```
 class CmdDef {
     def kwd: String;
@@ -54,70 +50,84 @@ class CmdDef {
 ```
 
 #### kwd
+
 ```
 def kwd: String;
 ```
+
 The keyword that identifies the command.
 
 #### description
+
 ```
 def description: String;
 ```
+
 A brief description of the command.
 
 #### options
+
 ```
 def options: Map[String, String];
 ```
+
 A list of option names and their descriptions.
 
 #### args
+
 ```
 def args: Map[String, String];
 ```
+
 A list of argument names and their descriptions.
 
 #### numRequiredArgs
+
 ```
 def numRequiredArgs: Int = -1;
 ```
+
 The number of required arguments. If set to `-1` (default), all arguments are considered required.
 
 #### subCmds
+
 ```
 def subCmds: Array[SrdRef[CmdDef]];
 ```
+
 An array of subcommands defined under this command.
 
 #### callback
+
 ```
 def callback: closure(options: Map[String, String], args: Array[String]);
 ```
+
 A closure function invoked when the command is executed, assuming it has no subcommands.
 
 #### startCallback
+
 ```
 def startCallback: closure(options: Map[String, String], args: Array[String]);
 ```
 A closure function invoked before processing subcommands.
 
 #### endCallback
+
 ```
 def endCallback: closure(options: Map[String, String], args: Array[String]);
 ```
 A closure function invoked after processing subcommands.
-
 
 #### findSubCmd
 
 ```
 handler this.findSubCmd(kwd: CharsPtr): SrdRef[CmdDef]
 ```
+
 Searches for a subcommand with the given keyword and returns a reference to it. Returns an empty reference if no matching subcommand is found.
 
 ## Global Variables
-
-
 
 ### cmdDef
 
@@ -126,8 +136,6 @@ this command is ignored, and its argument, option, and subcommand definitions ar
 
 ## Functions
 
-
-
 ### initialize
 
 ```
@@ -135,6 +143,7 @@ function initialize()
 function initialize(lang: String)
 function initialize(lang: String, localizationsPath: String)
 ```
+
 Initializes the library and loads localized translations. The first version uses the system's current
 language automatically. The second version allows specifying a custom language. The third version allows specifying both a custom language and a custom path to the localization files. The first and the second versions of this function embeds the localizations into the executable during compilation, whereas the third one loads them at run time. This function must be called at the beginning of the program before using other functions.
 
@@ -143,6 +152,7 @@ language automatically. The second version allows specifying a custom language. 
 ```
 function getLocalizationsPath(): String
 ```
+
 Returns the path to the localization files included with this library. This is typically used internally but
 it can be used for cases where the user doesn't want to embed the translations into the execcutable and wants
 instead to ship the localization files with the generated build.
@@ -167,6 +177,7 @@ explain from program inputs, while the second version accepts an explicit comman
 function parse(argStartIndex: Int)
 function parse(cmdDef: SrdRef[CmdDef], argStartIndex: Int): Int
 ```
+
 Parses command-line arguments starting from the specified index and invokes the appropriate processing functions.
 
 The first version uses the main command definition (`ProgArg.cmdDef`), while the second version accepts an explicit command definition and returns the argument index at which parsing stopped.
@@ -177,8 +188,6 @@ The first version assumes all arguments will be consumed and exits the program w
 * `cmdDef`: The command definition to start parsing from. The first version defaults to the main command definition.
 
 ## Example
-
-
 
 ```
 import "Apm";
@@ -201,22 +210,16 @@ ProgArg.parse(2);
 
 ## Error Handling
 
-
-
 Error messages are printed to `stderr`, and a non-zero exit code is returned if incorrect arguments are passed or
 required arguments are missing.
 
 ## Localization
-
-
 
 All texts can be localized using the `I18n` module. The `localizeCommands` parameter controls whether keywords, option
 names, and argument names are localized when generating help messages with functions like `printHelp` and
 `printCmdHelp`.
 
 ## License
-
-
 
 Copyright (C) 2026 Sarmad Abdullah
 
