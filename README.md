@@ -160,8 +160,8 @@ instead to ship the localization files with the generated build.
 ### printHelp
 
 ```
-function printHelp(argStartIndex: Int, localizeCommands: Bool)
-function printHelp(cmdDef: SrdRef[CmdDef], tabs: Int, localizeCommands: Bool)
+function printHelp(argStartIndex: Int)
+function printHelp(cmdDef: SrdRef[CmdDef], tabs: Int)
 ```
 Prints the help message for a command and its subcommands. The first version infers the command to
 explain from program inputs, while the second version accepts an explicit command definition.
@@ -169,7 +169,6 @@ explain from program inputs, while the second version accepts an explicit comman
 * `argStartIndex`: The index of the first argument in the program's input (excluding the program name). Typically `1` for precompiled programs, but `2` for interpreted execution since in the case of interpretation the first argument in `Process.args` will be `alusus`.
 * `cmdDef`: A reference to the command definition to explain.
 * `tabs`: The number of leading spaces for indentation.
-* `localizeCommands`: If `true`, keywords, argument names, and option names will be localized in the help output.
 
 ### parse
 
